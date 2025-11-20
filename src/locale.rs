@@ -46,7 +46,7 @@ fn setlocale(category: libc::c_int, locale: Option<&CStr>) -> Option<&'static CS
     };
     (!loc_ptr.is_null()).then(||
         // Safety: setlocale did not return a null-pointer, so it is a valid pointer
-        unsafe{CStr::from_ptr(loc_ptr)})
+        unsafe { CStr::from_ptr(loc_ptr) })
 }
 
 /// It's CHAR_MAX.
@@ -69,7 +69,7 @@ unsafe fn first_char(s: *const libc::c_char) -> Option<char> {
 unsafe fn lconv_to_locale(lconv: &libc::lconv) -> Locale {
     let decimal_point = unsafe { first_char(lconv.decimal_point).unwrap_or('.') };
     let thousands_sep = unsafe { first_char(lconv.thousands_sep) };
-    let empty = &[0 as libc::c_char];
+    let empty = &[0];
 
     // Up to 4 groups.
     // group_cursor is terminated by either a 0 or CHAR_MAX.
@@ -115,7 +115,7 @@ unsafe fn read_locale() -> Option<Locale> {
     // We create a new locale (pass 0 locale_t base)
     // and pass no "locale", so everything else is taken from the environment.
     // This is fine because we're only using this for numbers.
-    let loc = unsafe { libc::newlocale(libc::LC_NUMERIC_MASK, c"".as_ptr(), 0 as libc::locale_t) };
+    let loc = unsafe { libc::newlocale(libc::LC_NUMERIC_MASK, c"".as_ptr(), std::ptr::null_mut()) };
     if loc.is_null() {
         return None;
     }

@@ -4,7 +4,8 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 fn canonicalize<P: AsRef<Path>>(path: P) -> PathBuf {
-    std::fs::canonicalize(path).unwrap()
+    std::fs::canonicalize(path.as_ref())
+        .unwrap_or_else(|e| panic!("Failed to canonicalize path '{}': {}", path.as_ref().display(), e))
 }
 
 fn main() {
